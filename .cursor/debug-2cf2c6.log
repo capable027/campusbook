@@ -1,0 +1,4 @@
+{"sessionId":"2cf2c6","location":"auth.ts:authorize:entry","message":"credentials shape","data":{"hypothesisId":"H4","rawIdIsString":true,"passwordIsString":true},"timestamp":1776763247508,"runId":"post-fix"}
+{"sessionId":"2cf2c6","location":"auth.ts:authorize:afterFind","message":"lookup result","data":{"hypothesisId":"H1_H5","userFound":true,"idLen":22,"trimDiffers":false},"timestamp":1776763247718,"runId":"post-fix"}
+{"sessionId":"2cf2c6","location":"auth.ts:authorize:banned","message":"banned check","data":{"hypothesisId":"H2","banned":false},"timestamp":1776763247719,"runId":"post-fix"}
+{"sessionId":"2cf2c6","location":"auth.ts:authorize:bcrypt","message":"password compare","data":{"hypothesisId":"H3","passwordOk":true,"hashLen":60},"timestamp":1776763248024,"runId":"post-fix"}

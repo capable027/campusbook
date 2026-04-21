@@ -1,0 +1,3 @@
+{"sessionId":"81d652","hypothesisId":"H3","location":"user-nav-client.tsx:onClick:logout","message":"logout menu item clicked","data":{"defaultPrevented":false},"timestamp":1776760771979}
+{"sessionId":"81d652","hypothesisId":"H1-H2","location":"user-nav-client.tsx:signOut:before","message":"calling signOut","data":{"origin":"http://localhost:3001"},"timestamp":1776760771980}
+{"sessionId":"81d652","hypothesisId":"H1","location":"user-nav-client.tsx:signOut:after","message":"signOut promise resolved","data":{},"timestamp":1776760772026}
