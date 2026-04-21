@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Book } from "@prisma/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { bookImagesAsStrings } from "@/lib/book-queries";
 import { isLocallyServedBookImage } from "@/lib/uploads";
 
 type BookCardProps = {
@@ -10,7 +11,8 @@ type BookCardProps = {
 };
 
 export function BookCard({ book }: BookCardProps) {
-  const img = book.images[0] ?? "/file.svg";
+  const urls = bookImagesAsStrings(book.images);
+  const img = urls[0] ?? "/file.svg";
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">
       <Link href={`/books/${book.id}`} className="block">

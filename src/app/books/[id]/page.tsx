@@ -11,6 +11,7 @@ import { BOOK_STATUS_LABEL } from "@/lib/order-labels";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getSellerReviewPublic } from "@/lib/seller-reviews";
+import { bookImagesAsStrings } from "@/lib/book-queries";
 import { isLocallyServedBookImage } from "@/lib/uploads";
 
 export default async function BookDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +27,7 @@ export default async function BookDetailPage({ params }: { params: Promise<{ id:
   });
   if (!book) notFound();
 
+  const imageUrls = bookImagesAsStrings(book.images);
   const { agg: sellerReviewAgg, reviews: sellerReviews } = await getSellerReviewPublic(book.sellerId);
   const reviewCount = sellerReviewAgg._count._all;
   const avgRating =
@@ -44,20 +46,20 @@ export default async function BookDetailPage({ params }: { params: Promise<{ id:
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="space-y-3">
             <div className="relative aspect-[4/3] overflow-hidden rounded-lg border bg-muted">
-              {book.images[0] ? (
+              {imageUrls[0] ? (
                 <Image
-                  src={book.images[0]}
+                  src={imageUrls[0]}
                   alt=""
                   fill
                   className="object-cover"
                   priority
-                  unoptimized={isLocallyServedBookImage(book.images[0])}
+                  unoptimized={isLocallyServedBookImage(imageUrls[0])}
                 />
               ) : null}
             </div>
-            {book.images.length > 1 ? (
+            {imageUrls.length > 1 ? (
               <div className="grid grid-cols-4 gap-2">
-                {book.images.slice(1, 5).map((src) => (
+                {imageUrls.slice(1, 5).map((src) => (
                   <div key={src} className="relative aspect-square overflow-hidden rounded-md border bg-muted">
                     <Image
                       src={src}

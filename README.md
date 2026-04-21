@@ -1,10 +1,10 @@
 # CampusBook
 
-校内二手教材交易平台（Next.js App Router + Prisma + PostgreSQL + NextAuth）。
+校内二手教材交易平台（Next.js App Router + Prisma + MySQL + NextAuth）。
 
 ## 本地开发
 
-1. **PostgreSQL**：复制环境变量并启动数据库
+1. **MySQL**：复制环境变量并启动数据库
 
    ```bash
    cp .env.example .env

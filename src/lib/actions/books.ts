@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { BookStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { bookImagesAsStrings } from "@/lib/book-queries";
 import { bookCreateSchema } from "@/lib/validations";
 import { saveUploadedImages } from "@/lib/uploads";
 
@@ -98,7 +99,7 @@ export async function updateBookAction(
 
   const rawFiles = formData.getAll("images") as unknown as File[];
   const files = rawFiles.filter((f) => f instanceof File && f.size > 0) as File[];
-  let images = [...book.images];
+  let images = bookImagesAsStrings(book.images);
   if (files.length > 0) {
     let newUrls: string[] = [];
     try {

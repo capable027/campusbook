@@ -33,16 +33,16 @@ export default async function HomePage({
         ? [
             {
               OR: [
-                { title: { contains: q, mode: "insensitive" as const } },
-                { author: { contains: q, mode: "insensitive" as const } },
-                { isbn: { contains: q, mode: "insensitive" as const } },
-                { description: { contains: q, mode: "insensitive" as const } },
+                { title: { contains: q } },
+                { author: { contains: q } },
+                { isbn: { contains: q } },
+                { description: { contains: q } },
               ],
             },
           ]
         : []),
-      ...(major ? [{ major: { contains: major, mode: "insensitive" as const } }] : []),
-      ...(course ? [{ course: { contains: course, mode: "insensitive" as const } }] : []),
+      ...(major ? [{ major: { contains: major } }] : []),
+      ...(course ? [{ course: { contains: course } }] : []),
     ],
   };
 
@@ -76,7 +76,7 @@ export default async function HomePage({
         where: {
           status: BookStatus.ON_SALE,
           sellerId: { not: session.user.id },
-          major: { contains: me.major, mode: "insensitive" },
+          major: { contains: me.major },
           ...(me.grade ? { seller: { grade: me.grade } } : {}),
         },
         orderBy: { createdAt: "desc" },
