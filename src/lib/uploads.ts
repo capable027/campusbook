@@ -3,6 +3,7 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { put as vercelBlobPut } from "@vercel/blob";
+import { isLocallyServedBookImage } from "@/lib/book-image-url";
 
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -17,10 +18,7 @@ function safeFileName(original: string): string {
   return original.replace(/[^a-zA-Z0-9.-]/g, "") || "img";
 }
 
-/** True when the URL is served from this app’s `public/uploads` (local driver). */
-export function isLocallyServedBookImage(src: string): boolean {
-  return src.startsWith("/uploads/");
-}
+export { isLocallyServedBookImage };
 
 async function saveLocal(files: File[]): Promise<string[]> {
   const dir = path.join(process.cwd(), "public", "uploads");

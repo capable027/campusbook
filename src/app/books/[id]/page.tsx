@@ -12,7 +12,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getSellerReviewPublic } from "@/lib/seller-reviews";
 import { bookImagesAsStrings } from "@/lib/book-queries";
-import { isLocallyServedBookImage } from "@/lib/uploads";
+import { isLocallyServedBookImage } from "@/lib/book-image-url";
 
 export default async function BookDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -30,7 +30,11 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    remotePatterns: storageRemotePatterns(),
+    remotePatterns: [
+      ...storageRemotePatterns(),
+      /* Homepage demo / mock covers */
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+    ],
   },
 };
 

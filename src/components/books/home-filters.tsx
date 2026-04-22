@@ -24,7 +24,10 @@ export function HomeFilters() {
   }
 
   return (
-    <form onSubmit={apply} className="grid gap-4 rounded-lg border bg-card p-4 md:grid-cols-2 lg:grid-cols-4">
+    <form
+      onSubmit={apply}
+      className="grid gap-4 rounded-xl border-2 border-neutral-950 bg-white p-4 shadow-none md:grid-cols-2 lg:grid-cols-4 dark:border-neutral-100 dark:bg-neutral-950"
+    >
       <div className="space-y-2 lg:col-span-2">
         <Label htmlFor="q">关键词</Label>
         <Input
@@ -48,7 +51,7 @@ export function HomeFilters() {
           id="sort"
           name="sort"
           defaultValue={sp.get("sort") ?? "new"}
-          className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          className="flex h-10 w-full rounded-lg border-2 border-neutral-950 bg-white px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 focus-visible:outline-none dark:border-neutral-100 dark:bg-neutral-950"
         >
           <option value="new">最新发布</option>
           <option value="price_asc">价格从低到高</option>
