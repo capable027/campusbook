@@ -11,12 +11,10 @@ type BookRowCarouselProps = {
   title: string;
   description?: string;
   books: BookCardClientRow[];
-  /** Use demo cards (no link) for mock data. */
-  demo?: boolean;
   className?: string;
 };
 
-export function BookRowCarousel({ title, description, books, demo = false, className }: BookRowCarouselProps) {
+export function BookRowCarousel({ title, description, books, className }: BookRowCarouselProps) {
   const scrollerRef = React.useRef<HTMLDivElement>(null);
 
   function scrollByDir(dir: -1 | 1) {
@@ -68,7 +66,7 @@ export function BookRowCarousel({ title, description, books, demo = false, class
       >
         {books.map((book) => (
           <div key={book.id} className="w-[min(16rem,calc(100vw-3rem))] shrink-0 snap-start sm:w-60">
-            <BookCard book={book} demo={demo} className="h-full" />
+            <BookCard book={book} className="h-full" />
           </div>
         ))}
       </div>

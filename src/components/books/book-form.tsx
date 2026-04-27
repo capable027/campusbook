@@ -40,7 +40,7 @@ export function BookForm({ action, defaultValues, submitLabel = "提交" }: Prop
   const d = defaultValues;
 
   return (
-    <form action={formAction} encType="multipart/form-data" className="mx-auto max-w-xl space-y-6">
+    <form action={formAction} className="mx-auto max-w-xl space-y-6">
       {state.error ? (
         <p className="text-destructive text-sm" role="alert">
           {state.error}

@@ -3,12 +3,11 @@ import { BookStatus, type Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { bookCardSelect, serializeBookCardRow } from "@/lib/book-queries";
-import { BookCard } from "@/components/books/book-card";
 import { HomeFilters } from "@/components/books/home-filters";
 import { BookRowCarousel } from "@/components/home/book-row-carousel";
 import { BooksEmptyState } from "@/components/home/books-empty-state";
 import { buttonVariants } from "@/components/ui/button";
-import { HOME_MOCK_BOOKS } from "@/lib/home-mock-books";
+import { BookCard } from "@/components/books/book-card";
 import { cn } from "@/lib/utils";
 
 export type BookCardRow = Prisma.BookGetPayload<{ select: typeof bookCardSelect }>;
@@ -91,14 +90,38 @@ export async function HomeBooksFeed({
     }
   }
 
-  const guessBooks = recommended.length > 0 ? recommended : HOME_MOCK_BOOKS;
-  const guessDemo = recommended.length === 0;
+  const guessOnSale: Prisma.BookWhereInput = {
+    status: BookStatus.ON_SALE,
+    ...(session?.user?.id ? { sellerId: { not: session.user.id } } : {}),
+  };
 
-  const latestBooks = latestRaw.length > 0 ? latestRaw : HOME_MOCK_BOOKS;
-  const latestDemo = latestRaw.length === 0;
+  let guessBooks: BookCardRow[] = recommended;
+  if (recommended.length === 0) {
+    const afterLatest = await prisma.book.findMany({
+      where: guessOnSale,
+      orderBy: { createdAt: "desc" },
+      skip: 10,
+      take: 8,
+      select: bookCardSelect,
+    });
+    if (afterLatest.length > 0) {
+      guessBooks = afterLatest;
+    } else {
+      // Small catalog: re-use newest listings (may overlap 最新上架)
+      guessBooks = await prisma.book.findMany({
+        where: guessOnSale,
+        orderBy: { createdAt: "desc" },
+        take: 8,
+        select: bookCardSelect,
+      });
+    }
+  }
 
-  const latestForCarousel = latestBooks.map(serializeBookCardRow);
+  const latestForCarousel = latestRaw.map(serializeBookCardRow);
   const guessForCarousel = guessBooks.map(serializeBookCardRow);
+
+  const guessDescription =
+    recommended.length > 0 ? "根据你的专业为你挑选" : "更多在售教材";
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const hasFilters = Boolean(q || major || course || sort !== "new");
@@ -111,16 +134,12 @@ export async function HomeBooksFeed({
         title="最新上架"
         description="刚发布的教材，手慢无"
         books={latestForCarousel}
-        demo={latestDemo}
       />
 
       <BookRowCarousel
         title="猜你喜欢"
-        description={
-          session?.user && recommended.length > 0 ? "根据你的专业为你挑选" : "看看大家都在淘什么"
-        }
+        description={guessDescription}
         books={guessForCarousel}
-        demo={guessDemo}
       />
 
       <section id="books" className="scroll-mt-24 space-y-4">
