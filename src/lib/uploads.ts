@@ -109,6 +109,14 @@ async function saveVercelBlob(files: File[]): Promise<string[]> {
  */
 export async function saveUploadedImages(files: File[]): Promise<string[]> {
   const driver = storageDriver();
+  if (
+    driver === "local" &&
+    (process.env.VERCEL === "1" || process.env.AWS_LAMBDA_FUNCTION_NAME)
+  ) {
+    throw new Error(
+      "当前为 local 存储，在无服务器（如 Vercel）环境中无法写入磁盘。请在环境变量中设置 STORAGE_DRIVER=vercel-blob 并配置 BLOB_READ_WRITE_TOKEN，或使用 STORAGE_DRIVER=s3（及 README / .env.example 中的 S3 相关变量）。",
+    );
+  }
   if (driver === "s3") return saveS3(files);
   if (driver === "vercel-blob") return saveVercelBlob(files);
   return saveLocal(files);
