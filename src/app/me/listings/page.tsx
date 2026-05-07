@@ -28,9 +28,14 @@ export default async function MyListingsPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold tracking-tight">我的发布</h1>
+      <main className="bg-muted/20 mx-auto w-full max-w-6xl flex-1 px-4 py-10">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b pb-6">
+          <div className="max-w-2xl space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight">我的发布</h1>
+            <p className="text-muted-foreground text-sm">
+              「已售出」在完成订单后自动从广场下架但保留记录；「已下架」为手动撤回，广场不可见。
+            </p>
+          </div>
           <Link href="/books/new" className={cn(buttonVariants())}>
             发布新教材
           </Link>
@@ -38,7 +43,7 @@ export default async function MyListingsPage() {
         {books.length === 0 ? (
           <p className="text-muted-foreground">暂无发布，去上架一本吧。</p>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-lg border bg-card shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow>

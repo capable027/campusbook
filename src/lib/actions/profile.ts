@@ -6,7 +6,12 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { changePasswordSchema, profileUpdateSchema } from "@/lib/validations";
 
-export type ProfileActionState = { error?: string; success?: boolean; name?: string };
+export type ProfileActionState = {
+  error?: string;
+  success?: boolean;
+  name?: string;
+  image?: string | null;
+};
 
 export async function updateProfileAction(
   _prev: ProfileActionState | undefined,
@@ -19,24 +24,29 @@ export async function updateProfileAction(
     name: formData.get("name"),
     major: formData.get("major") ?? "",
     grade: formData.get("grade") ?? "",
+    location: formData.get("location") ?? "",
+    avatarUrl: formData.get("avatarUrl") ?? "",
   });
   if (!parsed.success) {
     return { error: parsed.error.flatten().formErrors.join("；") || "校验失败" };
   }
 
-  const { name, major, grade } = parsed.data;
+  const { name, major, grade, location, avatarUrl } = parsed.data;
+  const avatarClean = avatarUrl ?? null;
   await prisma.user.update({
     where: { id: session.user.id },
     data: {
       name,
       major: major && major.length > 0 ? major : null,
       grade: grade && grade.length > 0 ? grade : null,
+      location: location && location.trim().length > 0 ? location.trim() : null,
+      avatarUrl: avatarClean,
     },
   });
 
   revalidatePath("/me/settings");
   revalidatePath("/");
-  return { success: true, name };
+  return { success: true, name, image: avatarClean };
 }
 
 export type PasswordActionState = { error?: string; success?: boolean };

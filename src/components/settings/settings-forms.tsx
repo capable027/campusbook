@@ -28,6 +28,8 @@ type UserRow = {
   studentId: string | null;
   major: string | null;
   grade: string | null;
+  location: string | null;
+  avatarUrl: string | null;
 };
 
 export function SettingsForms({ user }: { user: UserRow }) {
@@ -42,10 +44,13 @@ export function SettingsForms({ user }: { user: UserRow }) {
   );
 
   useEffect(() => {
-    if (profileState.success && profileState.name && update) {
-      void update({ name: profileState.name });
+    if (profileState.success && update) {
+      void update({
+        ...(profileState.name ? { name: profileState.name } : {}),
+        ...(profileState.image !== undefined ? { image: profileState.image } : {}),
+      });
     }
-  }, [profileState.success, profileState.name, update]);
+  }, [profileState.success, profileState.name, profileState.image, update]);
 
   const loginHint = user.email
     ? `邮箱：${user.email}`
@@ -63,7 +68,7 @@ export function SettingsForms({ user }: { user: UserRow }) {
       <Card>
         <CardHeader>
           <CardTitle>基本资料</CardTitle>
-          <CardDescription>修改后在站内展示的名称与专业信息</CardDescription>
+          <CardDescription>姓名、头像链接与所在地会向其他同学展示（头像亦可粘贴图片 URL）</CardDescription>
         </CardHeader>
         <CardContent>
           <form action={profileFormAction} className="space-y-4">
@@ -97,6 +102,26 @@ export function SettingsForms({ user }: { user: UserRow }) {
                 <Label htmlFor="grade">年级</Label>
                 <Input id="grade" name="grade" placeholder="大三" defaultValue={user.grade ?? ""} />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="location">所在地（可选）</Label>
+              <Input
+                id="location"
+                name="location"
+                placeholder="如 海淀校区"
+                defaultValue={user.location ?? ""}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="avatarUrl">头像链接（可选）</Label>
+              <Input
+                id="avatarUrl"
+                name="avatarUrl"
+                type="url"
+                placeholder="https://…"
+                defaultValue={user.avatarUrl ?? ""}
+              />
+              <p className="text-muted-foreground text-xs">粘贴公开可访问的图片地址即可。</p>
             </div>
             <Button type="submit" disabled={profilePending}>
               {profilePending ? "保存中…" : "保存资料"}

@@ -23,6 +23,9 @@ export function ReviewForm({ orderId }: { orderId: string }) {
     <form action={formAction} className="space-y-4 rounded-lg border bg-card p-4">
       <input type="hidden" name="orderId" value={orderId} />
       <h3 className="font-semibold">评价卖家</h3>
+      <p className="text-muted-foreground text-sm leading-relaxed">
+        提交后会对其他买家公开展示（出现在该卖家的教材详情页），帮助建立信任。
+      </p>
       {state.error ? (
         <p className="text-destructive text-sm" role="alert">
           {state.error}

@@ -10,7 +10,7 @@ export function RemoveListingButton({ bookId }: { bookId: string }) {
   const [pending, setPending] = useState(false);
 
   async function onClick() {
-    if (!confirm("确定要下架该教材吗？")) return;
+    if (!confirm("确定将该教材下架吗？下架后不会出现在广场，与「已售出」不同；记录仍可在「我的发布」中查看。")) return;
     setPending(true);
     await removeBookAction(bookId);
     setPending(false);
@@ -19,7 +19,7 @@ export function RemoveListingButton({ bookId }: { bookId: string }) {
 
   return (
     <Button variant="destructive" size="sm" onClick={onClick} disabled={pending}>
-      {pending ? "…" : "下架"}
+      {pending ? "…" : "下架（不出现在广场）"}
     </Button>
   );
 }

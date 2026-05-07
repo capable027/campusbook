@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BOOK_CONDITIONS } from "@/lib/constants";
 import type { BookActionState } from "@/lib/actions/books";
+import { BookImagePicker } from "@/components/books/book-image-picker";
 
 type Props = {
   action: (prev: BookActionState | undefined, formData: FormData) => Promise<BookActionState>;
@@ -21,12 +22,19 @@ type Props = {
     major: string;
     course: string;
   };
+  /** Existing image URLs when editing */
+  existingImageUrls?: string[];
   submitLabel?: string;
 };
 
 const initial: BookActionState = {};
 
-export function BookForm({ action, defaultValues, submitLabel = "提交" }: Props) {
+export function BookForm({
+  action,
+  defaultValues,
+  existingImageUrls,
+  submitLabel = "提交",
+}: Props) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(action, initial);
 
@@ -103,9 +111,11 @@ export function BookForm({ action, defaultValues, submitLabel = "提交" }: Prop
         <Textarea id="description" name="description" required rows={6} defaultValue={d?.description} />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="images">图片（{d ? "可追加新图" : "至少一张"}）</Label>
-        <Input id="images" name="images" type="file" accept="image/*" multiple required={!d} />
-        <p className="text-muted-foreground text-xs">单张不超过 5MB，最多 6 张</p>
+        <Label>教材图片</Label>
+        <BookImagePicker
+          existingCount={existingImageUrls?.length ?? 0}
+          existingUrls={existingImageUrls ?? []}
+        />
       </div>
       <Button type="submit" disabled={pending}>
         {pending ? "提交中…" : submitLabel}

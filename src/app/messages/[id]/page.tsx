@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/layout/site-header";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ConversationChat } from "@/components/messages/conversation-chat";
@@ -16,11 +17,30 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     where: { id },
     include: {
       book: { select: { id: true, title: true } },
+      buyer: { select: { id: true, name: true } },
+      seller: { select: { id: true, name: true } },
     },
   });
   if (!conv || (conv.buyerId !== session.user.id && conv.sellerId !== session.user.id)) {
     notFound();
   }
+
+  await prisma.conversationParticipant.upsert({
+    where: {
+      conversationId_userId: {
+        conversationId: id,
+        userId: session.user.id,
+      },
+    },
+    create: {
+      conversationId: id,
+      userId: session.user.id,
+      lastReadAt: new Date(),
+    },
+    update: {
+      lastReadAt: new Date(),
+    },
+  });
 
   const rows = await prisma.message.findMany({
     where: { conversationId: id },
@@ -38,10 +58,14 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
     sender: m.sender,
   }));
 
+  const isBuyer = conv.buyerId === session.user.id;
+  const peer = isBuyer ? conv.seller : conv.buyer;
+  const peerRole = isBuyer ? "卖家" : "买家";
+
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8">
+      <main className="bg-muted/15 mx-auto w-full max-w-2xl flex-1 px-4 py-10">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
             <Link
@@ -50,10 +74,16 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
             >
               ← 会话列表
             </Link>
-            <h1 className="mt-2 text-xl font-semibold">{conv.book.title}</h1>
-            <p className="text-muted-foreground text-sm">
-              <Link href={`/books/${conv.book.id}`} className="hover:underline">
-                查看教材详情
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <h1 className="text-xl font-semibold">{peer.name}</h1>
+              <Badge variant="secondary" className="font-normal">
+                {peerRole}
+              </Badge>
+            </div>
+            <p className="text-muted-foreground mt-1 text-sm">
+              《{conv.book.title}》 ·{" "}
+              <Link href={`/books/${conv.book.id}`} className="text-primary hover:underline">
+                教材详情
               </Link>
             </p>
           </div>

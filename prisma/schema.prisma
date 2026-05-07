@@ -38,6 +38,8 @@ model User {
   role         UserRole @default(USER)
   major        String?
   grade        String?
+  avatarUrl    String?
+  location     String?
   banned       Boolean  @default(false)
   bannedReason String?
   createdAt    DateTime @default(now())
@@ -47,9 +49,10 @@ model User {
   ordersBuyer  Order[]  @relation("BuyerOrders")
   ordersSeller Order[]  @relation("SellerOrders")
 
-  conversationsBuyer  Conversation[] @relation("ConvBuyer")
-  conversationsSeller Conversation[] @relation("ConvSeller")
-  messagesSent        Message[]      @relation("MessageSender")
+  conversationsBuyer       Conversation[]             @relation("ConvBuyer")
+  conversationsSeller      Conversation[]             @relation("ConvSeller")
+  conversationParticipants ConversationParticipant[]
+  messagesSent               Message[]                  @relation("MessageSender")
 
   reviewsGiven    Review[] @relation("ReviewGiver")
   reviewsReceived Review[] @relation("ReviewReceiver")
@@ -112,13 +115,25 @@ model Conversation {
   sellerId      String
   lastMessageAt DateTime @default(now())
 
-  book   Book @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  buyer  User @relation("ConvBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
-  seller User @relation("ConvSeller", fields: [sellerId], references: [id], onDelete: Cascade)
-
-  messages Message[]
+  book         Book                      @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  buyer        User                      @relation("ConvBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller       User                      @relation("ConvSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages     Message[]
+  participants ConversationParticipant[]
 
   @@unique([bookId, buyerId])
+}
+
+model ConversationParticipant {
+  conversationId String
+  userId         String
+  lastReadAt     DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([conversationId, userId])
+  @@index([userId])
 }
 
 model Message {

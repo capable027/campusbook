@@ -97,7 +97,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         ) : null}
 
         {showReview ? (
-          <div className="mt-8">
+          <div className="mt-8 space-y-3">
+            <p className="text-muted-foreground text-sm">
+              交易已完成，欢迎留下公开评价，帮助下一届同学判断卖家信誉。
+            </p>
             <ReviewForm orderId={order.id} />
           </div>
         ) : null}

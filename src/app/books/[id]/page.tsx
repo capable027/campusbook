@@ -11,6 +11,7 @@ import { BOOK_STATUS_LABEL } from "@/lib/order-labels";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getSellerReviewPublic } from "@/lib/seller-reviews";
+import { getSellerPublicStatsBatch } from "@/lib/seller-public-stats";
 import { bookImagesAsStrings } from "@/lib/book-queries";
 import { isLocallyServedBookImage } from "@/lib/book-image-url";
 
@@ -28,7 +29,11 @@ export default async function BookDetailPage({ params }: { params: Promise<{ id:
   if (!book) notFound();
 
   const imageUrls = bookImagesAsStrings(book.images);
-  const { agg: sellerReviewAgg, reviews: sellerReviews } = await getSellerReviewPublic(book.sellerId);
+  const [{ agg: sellerReviewAgg, reviews: sellerReviews }, tradeMap] = await Promise.all([
+    getSellerReviewPublic(book.sellerId),
+    getSellerPublicStatsBatch([book.sellerId]),
+  ]);
+  const sellerTrade = tradeMap.get(book.sellerId)!;
   const reviewCount = sellerReviewAgg._count._all;
   const avgRating =
     sellerReviewAgg._avg.rating != null ? Number(sellerReviewAgg._avg.rating) : null;
@@ -103,6 +108,13 @@ export default async function BookDetailPage({ params }: { params: Promise<{ id:
                     <span className="text-muted-foreground"> · {reviewCount} 条评价</span>
                   </>
                 )}
+                {sellerTrade.completedSales > 0 ? (
+                  <span className="text-muted-foreground">
+                    {" "}
+                    · 累计成交 <span className="font-medium text-foreground">{sellerTrade.completedSales}</span>{" "}
+                    单（作为卖家）
+                  </span>
+                ) : null}
               </p>
             </div>
             {book.isbn ? (

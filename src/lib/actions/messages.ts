@@ -27,6 +27,9 @@ export async function ensureConversationAction(bookId: string): Promise<{ conver
       bookId,
       buyerId,
       sellerId,
+      participants: {
+        create: [{ userId: buyerId }, { userId: sellerId }],
+      },
     },
   });
 

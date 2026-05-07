@@ -30,12 +30,15 @@ export default async function MyOrdersPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-        <h1 className="mb-6 text-2xl font-bold tracking-tight">我的订单</h1>
+      <main className="bg-muted/20 mx-auto w-full max-w-6xl flex-1 px-4 py-10">
+        <header className="mb-8 space-y-1 border-b pb-6">
+          <h1 className="text-2xl font-bold tracking-tight">我的订单</h1>
+          <p className="text-muted-foreground text-sm">查看买卖双方信息与订单进度。</p>
+        </header>
         {orders.length === 0 ? (
           <p className="text-muted-foreground">暂无订单</p>
         ) : (
-          <div className="rounded-md border">
+          <div className="rounded-lg border bg-card shadow-sm">
             <Table>
               <TableHeader>
                 <TableRow>

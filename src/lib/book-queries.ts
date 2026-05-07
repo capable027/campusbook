@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import type { SellerPublicStats } from "@/lib/seller-public-stats";
 
 function priceToNumber(raw: unknown): number {
   if (typeof raw === "number" && !Number.isNaN(raw)) return raw;
@@ -24,6 +25,7 @@ export function bookImagesAsStrings(value: Prisma.JsonValue | null | undefined):
 
 export const bookCardSelect = {
   id: true,
+  sellerId: true,
   title: true,
   author: true,
   price: true,
@@ -41,8 +43,16 @@ export const bookCardSelect = {
 export type BookCardRowPayload = Prisma.BookGetPayload<{ select: typeof bookCardSelect }>;
 
 /** Plain `price` for Client Components (Prisma `Decimal` is not RSC-serializable). */
-export type BookCardClientRow = Omit<BookCardRowPayload, "price"> & { price: number };
+export type BookCardClientRow = Omit<BookCardRowPayload, "price"> & {
+  price: number;
+  sellerStats?: SellerPublicStats;
+};
 
-export function serializeBookCardRow(row: BookCardRowPayload): BookCardClientRow {
-  return { ...row, price: priceToNumber(row.price) };
+export function serializeBookCardRow(
+  row: BookCardRowPayload,
+  sellerStats?: SellerPublicStats | null,
+): BookCardClientRow {
+  const base: BookCardClientRow = { ...row, price: priceToNumber(row.price) };
+  if (sellerStats != null) base.sellerStats = sellerStats;
+  return base;
 }

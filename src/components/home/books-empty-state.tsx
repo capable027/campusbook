@@ -33,7 +33,7 @@ export function BooksEmptyState({ hasFilters, className }: BooksEmptyStateProps)
           发布我的书
         </Link>
         {hasFilters ? (
-          <Link href="/" className={buttonVariants({ variant: "ghost", className: "rounded-xl" })}>
+          <Link href="/books" className={buttonVariants({ variant: "ghost", className: "rounded-xl" })}>
             清除筛选
           </Link>
         ) : null}

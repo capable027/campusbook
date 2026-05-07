@@ -35,6 +35,15 @@ export const profileUpdateSchema = z.object({
   name: z.string().min(1, "请输入姓名"),
   major: z.string().optional(),
   grade: z.string().optional(),
+  location: z.string().max(120).optional(),
+  avatarUrl: z.preprocess(
+    (v) => {
+      if (v == null || v === "") return undefined;
+      const t = String(v).trim();
+      return t.length === 0 ? undefined : t;
+    },
+    z.string().url("头像链接格式不正确").optional(),
+  ),
 });
 
 export const changePasswordSchema = z

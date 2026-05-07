@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -34,40 +35,55 @@ export default async function AdminStatsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-2xl font-bold tracking-tight">数据统计</h1>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">数据统计</h1>
+        <p className="text-muted-foreground mt-1 text-sm">以下为实时汇总；点击下方卡片可跳转到对应管理列表。</p>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">用户数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold">{userCount}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">教材数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold">{bookCount}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">订单数</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold">{orderCount}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">成交订单</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-semibold">{completedCount}</p>
-          </CardContent>
-        </Card>
+        <Link href="/admin/users" className="block rounded-xl transition-opacity hover:opacity-90">
+          <Card className="h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">用户数</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-semibold">{userCount}</p>
+              <p className="text-muted-foreground mt-2 text-xs">管理用户 →</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/admin/books" className="block rounded-xl transition-opacity hover:opacity-90">
+          <Card className="h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">教材数</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-semibold">{bookCount}</p>
+              <p className="text-muted-foreground mt-2 text-xs">管理教材 →</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/admin/orders" className="block rounded-xl transition-opacity hover:opacity-90">
+          <Card className="h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">订单数</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-semibold">{orderCount}</p>
+              <p className="text-muted-foreground mt-2 text-xs">管理订单 →</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/admin/orders" className="block rounded-xl transition-opacity hover:opacity-90">
+          <Card className="h-full">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">成交订单</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-semibold">{completedCount}</p>
+              <p className="text-muted-foreground mt-2 text-xs">在订单列表筛选「已完成」→</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       <Card>
@@ -91,7 +107,15 @@ export default async function AdminStatsPage() {
                   const b = bookMap.get(row.bookId);
                   return (
                     <TableRow key={row.bookId}>
-                      <TableCell>{b?.title ?? row.bookId}</TableCell>
+                      <TableCell>
+                        {b ? (
+                          <Link href={`/books/${b.id}`} className="text-primary font-medium hover:underline">
+                            {b.title}
+                          </Link>
+                        ) : (
+                          row.bookId
+                        )}
+                      </TableCell>
                       <TableCell>{b?.author ?? "—"}</TableCell>
                       <TableCell className="text-right">{row._count.bookId}</TableCell>
                     </TableRow>

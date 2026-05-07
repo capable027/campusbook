@@ -30,7 +30,7 @@ export function CategoryGrid({ className }: { className?: string }) {
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {CATEGORIES.map(({ name, q, icon: Icon }) => (
-          <Link key={name} href={`/?q=${encodeURIComponent(q)}`} className="group block outline-none">
+          <Link key={name} href={`/books?q=${encodeURIComponent(q)}`} className="group block outline-none">
             <Card className="flex flex-row items-center gap-3 rounded-xl p-4 transition-all duration-300 hover:scale-105">
               <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-neutral-800 transition-colors group-hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:group-hover:bg-neutral-700">
                 <Icon className="size-5" aria-hidden />

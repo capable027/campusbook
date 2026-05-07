@@ -65,8 +65,11 @@ export function BookRowCarousel({ title, description, books, className }: BookRo
         )}
       >
         {books.map((book) => (
-          <div key={book.id} className="w-[min(16rem,calc(100vw-3rem))] shrink-0 snap-start sm:w-60">
-            <BookCard book={book} className="h-full" />
+          <div
+            key={book.id}
+            className="w-[min(16rem,calc(100vw-3rem))] shrink-0 snap-start touch-manipulation sm:w-60"
+          >
+            <BookCard book={book} className="h-full min-h-[280px]" />
           </div>
         ))}
       </div>

@@ -4,30 +4,40 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-export function HomeFilters() {
+
+type HomeFiltersProps = {
+  /** Canonical listing URL for advanced search (pagination lives here). */
+  listingBasePath?: string;
+};
+
+export function HomeFilters({ listingBasePath = "/books" }: HomeFiltersProps) {
   const router = useRouter();
   const sp = useSearchParams();
+
+  const q = (sp.get("q") ?? "").trim();
+  const major = (sp.get("major") ?? "").trim();
+  const course = (sp.get("course") ?? "").trim();
+  const sort = sp.get("sort") ?? "new";
+  const hasAdvancedFilters = Boolean(q || major || course || (sort && sort !== "new"));
 
   function apply(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const q = String(fd.get("q") ?? "").trim();
-    const major = String(fd.get("major") ?? "").trim();
-    const course = String(fd.get("course") ?? "").trim();
-    const sort = String((fd.get("sort") as string) ?? "new");
+    const qv = String(fd.get("q") ?? "").trim();
+    const majorV = String(fd.get("major") ?? "").trim();
+    const courseV = String(fd.get("course") ?? "").trim();
+    const sortV = String((fd.get("sort") as string) ?? "new");
     const params = new URLSearchParams();
-    if (q) params.set("q", q);
-    if (major) params.set("major", major);
-    if (course) params.set("course", course);
-    if (sort && sort !== "new") params.set("sort", sort);
-    router.push(`/?${params.toString()}`);
+    if (qv) params.set("q", qv);
+    if (majorV) params.set("major", majorV);
+    if (courseV) params.set("course", courseV);
+    if (sortV && sortV !== "new") params.set("sort", sortV);
+    const qs = params.toString();
+    router.push(qs ? `${listingBasePath}?${qs}` : listingBasePath);
   }
 
-  return (
-    <form
-      onSubmit={apply}
-      className="grid gap-4 rounded-xl border-2 border-neutral-950 bg-white p-4 shadow-none md:grid-cols-2 lg:grid-cols-4 dark:border-neutral-100 dark:bg-neutral-950"
-    >
+  const fields = (
+    <>
       <div className="space-y-2 lg:col-span-2">
         <Label htmlFor="q">关键词</Label>
         <Input
@@ -63,6 +73,23 @@ export function HomeFilters() {
           搜索
         </Button>
       </div>
-    </form>
+    </>
+  );
+
+  return (
+    <details
+      className="rounded-xl border-2 border-neutral-950 bg-white shadow-none dark:border-neutral-100 dark:bg-neutral-950"
+      open={hasAdvancedFilters}
+    >
+      <summary className="cursor-pointer list-none px-4 py-3 font-semibold tracking-tight [&::-webkit-details-marker]:hidden">
+        <span className="text-base">进阶筛选</span>
+        <span className="text-muted-foreground ml-2 text-sm font-normal">
+          专业、课程、排序；顶部搜索框仅关键词
+        </span>
+      </summary>
+      <form onSubmit={apply} className="grid gap-4 border-t-2 border-neutral-950 p-4 md:grid-cols-2 lg:grid-cols-4 dark:border-neutral-100">
+        {fields}
+      </form>
+    </details>
   );
 }

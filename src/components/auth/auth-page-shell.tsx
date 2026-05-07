@@ -9,7 +9,11 @@ type AuthPageShellProps = {
 export function AuthPageShell({ heroTitle, heroDescription, children }: AuthPageShellProps) {
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] flex-col lg:grid lg:min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-      <aside className="flex flex-col justify-center border-b bg-muted/40 px-6 py-10 lg:border-b-0 lg:border-r lg:px-8 lg:py-14 xl:px-14">
+      <aside className="relative flex flex-col justify-center overflow-hidden border-b bg-gradient-to-br from-muted via-muted/90 to-muted/60 px-6 py-10 lg:border-b-0 lg:border-r lg:px-8 lg:py-14 xl:px-14">
+        <div
+          className="pointer-events-none absolute -top-10 right-0 size-40 rounded-full bg-primary/10 blur-2xl"
+          aria-hidden
+        />
         <div className="mx-auto w-full max-w-md space-y-3 lg:mx-0">
           <p className="text-sm font-medium text-muted-foreground">CampusBook</p>
           <h1 className="text-balance text-2xl font-semibold tracking-tight lg:text-3xl">{heroTitle}</h1>

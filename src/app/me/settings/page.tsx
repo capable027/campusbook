@@ -10,14 +10,14 @@ export default async function SettingsPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { name: true, email: true, studentId: true, major: true, grade: true },
+    select: { name: true, email: true, studentId: true, major: true, grade: true, location: true, avatarUrl: true },
   });
   if (!user) redirect("/login");
 
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+      <main className="bg-muted/30 mx-auto w-full max-w-6xl flex-1 px-4 py-10">
         <SettingsForms user={user} />
       </main>
     </div>

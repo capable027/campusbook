@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { SiteHeader } from "@/components/layout/site-header";
 import { BookForm } from "@/components/books/book-form";
 import { updateBookAction } from "@/lib/actions/books";
+import { bookImagesAsStrings } from "@/lib/book-queries";
 
 export default async function EditBookPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -19,6 +20,7 @@ export default async function EditBookPage({ params }: { params: Promise<{ id: s
         <h1 className="mb-6 text-2xl font-bold tracking-tight">编辑教材</h1>
         <BookForm
           action={updateBookAction.bind(null, book.id)}
+          existingImageUrls={bookImagesAsStrings(book.images)}
           defaultValues={{
             title: book.title,
             author: book.author,

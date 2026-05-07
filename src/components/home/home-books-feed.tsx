@@ -3,6 +3,7 @@ import { BookStatus, type Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { bookCardSelect, serializeBookCardRow } from "@/lib/book-queries";
+import { getSellerPublicStatsBatch } from "@/lib/seller-public-stats";
 import { HomeFilters } from "@/components/books/home-filters";
 import { BookRowCarousel } from "@/components/home/book-row-carousel";
 import { BooksEmptyState } from "@/components/home/books-empty-state";
@@ -14,8 +15,14 @@ export type BookCardRow = Prisma.BookGetPayload<{ select: typeof bookCardSelect 
 
 export async function HomeBooksFeed({
   searchParams,
+  listingBasePath = "/books",
+  showDiscoverySections = true,
 }: {
   searchParams: Record<string, string | string[] | undefined>;
+  /** Base path for filter submit + pagination (e.g. `/books`). */
+  listingBasePath?: string;
+  /** When false (browse page), hide carousels to focus on the catalog grid. */
+  showDiscoverySections?: boolean;
 }) {
   const q = typeof searchParams.q === "string" ? searchParams.q.trim() : "";
   const major = typeof searchParams.major === "string" ? searchParams.major.trim() : "";
@@ -117,8 +124,14 @@ export async function HomeBooksFeed({
     }
   }
 
-  const latestForCarousel = latestRaw.map(serializeBookCardRow);
-  const guessForCarousel = guessBooks.map(serializeBookCardRow);
+  const statsMap = await getSellerPublicStatsBatch([
+    ...books.map((b) => b.sellerId),
+    ...latestRaw.map((b) => b.sellerId),
+    ...guessBooks.map((b) => b.sellerId),
+  ]);
+
+  const latestForCarousel = latestRaw.map((r) => serializeBookCardRow(r, statsMap.get(r.sellerId)));
+  const guessForCarousel = guessBooks.map((r) => serializeBookCardRow(r, statsMap.get(r.sellerId)));
 
   const guessDescription =
     recommended.length > 0 ? "根据你的专业为你挑选" : "更多在售教材";
@@ -128,35 +141,47 @@ export async function HomeBooksFeed({
 
   return (
     <>
-      <HomeFilters />
+      <HomeFilters listingBasePath={listingBasePath} />
 
-      <BookRowCarousel
-        title="最新上架"
-        description="刚发布的教材，手慢无"
-        books={latestForCarousel}
-      />
+      {showDiscoverySections ? (
+        <>
+          <BookRowCarousel
+            title="最新上架"
+            description="展示最近发布的 10 本在售教材（不受下方分页影响）"
+            books={latestForCarousel}
+          />
 
-      <BookRowCarousel
-        title="猜你喜欢"
-        description={guessDescription}
-        books={guessForCarousel}
-      />
+          <BookRowCarousel
+            title="猜你喜欢"
+            description={guessDescription}
+            books={guessForCarousel}
+          />
+        </>
+      ) : null}
 
-      <section id="books" className="scroll-mt-24 space-y-4">
+      <section id="books" className="scroll-mt-28 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold tracking-tight">全部好书</h2>
-          <p className="text-muted-foreground text-sm">共 {total} 本在售</p>
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight">全部好书</h2>
+            <p className="text-muted-foreground mt-1 text-xs">
+              在售教材目录；默认按发布时间分页，每页 12 本（不含草稿、待审与已下架）。
+            </p>
+          </div>
+          <p className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-sm font-medium tabular-nums">
+            共 {total} 本在售
+          </p>
         </div>
         {books.length === 0 ? (
           <BooksEmptyState hasFilters={hasFilters} />
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
             {books.map((b) => (
-              <BookCard key={b.id} book={b} />
+              <BookCard key={b.id} book={serializeBookCardRow(b, statsMap.get(b.sellerId))} />
             ))}
           </div>
         )}
         <Pagination
+          listingBasePath={listingBasePath}
           page={page}
           totalPages={totalPages}
           q={q}
@@ -170,6 +195,7 @@ export async function HomeBooksFeed({
 }
 
 function Pagination({
+  listingBasePath,
   page,
   totalPages,
   q,
@@ -177,6 +203,7 @@ function Pagination({
   course,
   sort,
 }: {
+  listingBasePath: string;
   page: number;
   totalPages: number;
   q: string;
@@ -192,7 +219,8 @@ function Pagination({
     if (course) params.set("course", course);
     if (sort && sort !== "new") params.set("sort", sort);
     params.set("page", String(p));
-    return `/?${params.toString()}`;
+    const qs = params.toString();
+    return qs ? `${listingBasePath}?${qs}` : listingBasePath;
   };
   return (
     <div className="flex items-center justify-center gap-2 pt-4">
