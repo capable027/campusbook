@@ -174,9 +174,13 @@ export async function HomeBooksFeed({
         {books.length === 0 ? (
           <BooksEmptyState hasFilters={hasFilters} />
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {books.map((b) => (
-              <BookCard key={b.id} book={serializeBookCardRow(b, statsMap.get(b.sellerId))} />
+              <BookCard
+                key={b.id}
+                compact
+                book={serializeBookCardRow(b, statsMap.get(b.sellerId))}
+              />
             ))}
           </div>
         )}

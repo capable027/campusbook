@@ -48,6 +48,10 @@ export function BookImagePicker({
     input.files = dt.files;
   }
 
+  React.useEffect(() => {
+    syncInput(files);
+  }, [files]);
+
   function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     setError(null);
     const picked = Array.from(e.target.files ?? []).filter((f) => f.size > 0);
@@ -63,15 +67,12 @@ export function BookImagePicker({
       if (merged.length + existingCount >= MAX_FILES) break;
       merged.push(f);
     }
-    setFiles(merged);
-    syncInput(merged);
     e.target.value = "";
+    setFiles(merged);
   }
 
   function removeAt(index: number) {
-    const next = files.filter((_, i) => i !== index);
-    setFiles(next);
-    syncInput(next);
+    setFiles(files.filter((_, i) => i !== index));
   }
 
   const needsNewFiles = existingCount === 0;

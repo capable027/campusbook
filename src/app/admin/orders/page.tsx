@@ -47,7 +47,7 @@ export default async function AdminOrdersPage() {
                   <Badge variant="secondary">{ORDER_STATUS_LABEL[o.status]}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Link href={`/me/orders/${o.id}`} className="text-primary text-sm underline">
+                  <Link href={`/admin/orders/${o.id}`} className="text-primary text-sm underline">
                     查看
                   </Link>
                 </TableCell>

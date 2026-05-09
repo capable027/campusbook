@@ -8,7 +8,7 @@ export function HomeBooksSkeleton({ className }: { className?: string }) {
         <div className="bg-muted h-7 w-40 animate-pulse rounded-xl" />
         <div className="bg-muted h-4 w-24 animate-pulse rounded-lg" />
       </div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <Card key={i} className="overflow-hidden rounded-xl p-0">
             <div className="bg-muted aspect-[3/4] w-full animate-pulse" />

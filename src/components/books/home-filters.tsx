@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,10 +15,23 @@ export function HomeFilters({ listingBasePath = "/books" }: HomeFiltersProps) {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const q = (sp.get("q") ?? "").trim();
-  const major = (sp.get("major") ?? "").trim();
-  const course = (sp.get("course") ?? "").trim();
-  const sort = sp.get("sort") ?? "new";
+  const qUrl = (sp.get("q") ?? "").trim();
+  const majorUrl = (sp.get("major") ?? "").trim();
+  const courseUrl = (sp.get("course") ?? "").trim();
+  const sortUrl = sp.get("sort") ?? "new";
+
+  const [q, setQ] = useState(qUrl);
+  const [major, setMajor] = useState(majorUrl);
+  const [course, setCourse] = useState(courseUrl);
+  const [sort, setSort] = useState(sortUrl);
+
+  useEffect(() => {
+    setQ(qUrl);
+    setMajor(majorUrl);
+    setCourse(courseUrl);
+    setSort(sortUrl);
+  }, [qUrl, majorUrl, courseUrl, sortUrl]);
+
   const hasAdvancedFilters = Boolean(q || major || course || (sort && sort !== "new"));
 
   function apply(e: React.FormEvent<HTMLFormElement>) {
@@ -44,23 +58,37 @@ export function HomeFilters({ listingBasePath = "/books" }: HomeFiltersProps) {
           id="q"
           name="q"
           placeholder="书名、作者、ISBN、描述"
-          defaultValue={sp.get("q") ?? ""}
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor="major">专业</Label>
-        <Input id="major" name="major" placeholder="如 计算机" defaultValue={sp.get("major") ?? ""} />
+        <Input
+          id="major"
+          name="major"
+          placeholder="如 计算机"
+          value={major}
+          onChange={(e) => setMajor(e.target.value)}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="course">课程</Label>
-        <Input id="course" name="course" placeholder="课程名" defaultValue={sp.get("course") ?? ""} />
+        <Input
+          id="course"
+          name="course"
+          placeholder="课程名"
+          value={course}
+          onChange={(e) => setCourse(e.target.value)}
+        />
       </div>
       <div className="space-y-2 md:col-span-2 lg:col-span-1">
         <Label htmlFor="sort">排序</Label>
         <select
           id="sort"
           name="sort"
-          defaultValue={sp.get("sort") ?? "new"}
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
           className="flex h-10 w-full rounded-lg border-2 border-neutral-950 bg-white px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-neutral-950 focus-visible:ring-offset-2 focus-visible:outline-none dark:border-neutral-100 dark:bg-neutral-950"
         >
           <option value="new">最新发布</option>

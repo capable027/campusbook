@@ -18,9 +18,22 @@ function safeFileName(original: string): string {
   return original.replace(/[^a-zA-Z0-9.-]/g, "") || "img";
 }
 
+function uploadBaseName(blob: Blob): string {
+  return blob instanceof File && blob.name ? blob.name : "";
+}
+
+/**
+ * Parts from FormData.getAll("images") may be Blob (not instanceof File) in Node Server Actions.
+ */
+export function blobsFromMultipartImageField(parts: Iterable<unknown>): Blob[] {
+  return Array.from(parts).filter(
+    (p): p is Blob => typeof p === "object" && p !== null && p instanceof Blob && p.size > 0,
+  );
+}
+
 export { isLocallyServedBookImage };
 
-async function saveLocal(files: File[]): Promise<string[]> {
+async function saveLocal(files: Blob[]): Promise<string[]> {
   const dir = path.join(process.cwd(), "public", "uploads");
   await mkdir(dir, { recursive: true });
   const urls: string[] = [];
@@ -28,7 +41,7 @@ async function saveLocal(files: File[]): Promise<string[]> {
     if (!f || f.size === 0) continue;
     if (f.size > MAX_BYTES) continue;
     const buf = Buffer.from(await f.arrayBuffer());
-    const name = `${randomUUID()}-${safeFileName(f.name)}`;
+    const name = `${randomUUID()}-${safeFileName(uploadBaseName(f))}`;
     const dest = path.join(dir, name);
     await writeFile(dest, buf);
     urls.push(`/uploads/${name}`);
@@ -36,7 +49,7 @@ async function saveLocal(files: File[]): Promise<string[]> {
   return urls;
 }
 
-async function saveS3(files: File[]): Promise<string[]> {
+async function saveS3(files: Blob[]): Promise<string[]> {
   const bucket = process.env.S3_BUCKET;
   const base = process.env.ASSET_PUBLIC_BASE_URL?.replace(/\/$/, "");
   if (!bucket || !base) {
@@ -66,7 +79,7 @@ async function saveS3(files: File[]): Promise<string[]> {
     if (!f || f.size === 0) continue;
     if (f.size > MAX_BYTES) continue;
     const buf = Buffer.from(await f.arrayBuffer());
-    const fileName = `${randomUUID()}-${safeFileName(f.name)}`;
+    const fileName = `${randomUUID()}-${safeFileName(uploadBaseName(f))}`;
     const key = `uploads/${fileName}`;
     await client.send(
       new PutObjectCommand({
@@ -81,7 +94,7 @@ async function saveS3(files: File[]): Promise<string[]> {
   return urls;
 }
 
-async function saveVercelBlob(files: File[]): Promise<string[]> {
+async function saveVercelBlob(files: Blob[]): Promise<string[]> {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   if (!token) {
     throw new Error("Vercel Blob 需要设置 BLOB_READ_WRITE_TOKEN");
@@ -91,7 +104,7 @@ async function saveVercelBlob(files: File[]): Promise<string[]> {
     if (!f || f.size === 0) continue;
     if (f.size > MAX_BYTES) continue;
     const buf = Buffer.from(await f.arrayBuffer());
-    const fileName = `${randomUUID()}-${safeFileName(f.name)}`;
+    const fileName = `${randomUUID()}-${safeFileName(uploadBaseName(f))}`;
     const pathname = `campusbook/uploads/${fileName}`;
     const blob = await vercelBlobPut(pathname, buf, {
       access: "public",
@@ -107,7 +120,7 @@ async function saveVercelBlob(files: File[]): Promise<string[]> {
  * Persist uploaded book images and return public URLs stored on `Book.images`.
  * Empty files are skipped; each file max 5MB.
  */
-export async function saveUploadedImages(files: File[]): Promise<string[]> {
+export async function saveUploadedImages(files: Blob[]): Promise<string[]> {
   const driver = storageDriver();
   if (
     driver === "local" &&

@@ -12,10 +12,12 @@ type BookCardProps = {
   book: BookCardBook;
   /** Non-clickable preview (e.g. mock carousel items). */
   demo?: boolean;
+  /** Denser card for multi-column catalog grids. */
+  compact?: boolean;
   className?: string;
 };
 
-export function BookCard({ book, demo = false, className }: BookCardProps) {
+export function BookCard({ book, demo = false, compact = false, className }: BookCardProps) {
   const urls = bookImagesAsStrings(book.images);
   const img = urls[0] ?? "/file.svg";
   const multiCount = urls.length;
@@ -41,13 +43,22 @@ export function BookCard({ book, demo = false, className }: BookCardProps) {
 
   const body = (
     <>
-      <div className="relative aspect-[4/5] w-full shrink-0 overflow-hidden bg-neutral-100 dark:bg-neutral-900 xl:aspect-[3/4]">
+      <div
+        className={cn(
+          "relative w-full shrink-0 overflow-hidden bg-neutral-100 dark:bg-neutral-900",
+          compact ? "aspect-[3/4]" : "aspect-[4/5] xl:aspect-[3/4]",
+        )}
+      >
         <Image
           src={img}
           alt=""
           fill
           className="object-cover"
-          sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+          sizes={
+            compact
+              ? "(max-width:640px) 50vw, 18vw"
+              : "(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+          }
           unoptimized={isLocallyServedBookImage(img) || img.includes("unsplash.com")}
         />
         {multiCount > 1 ? (
@@ -56,12 +67,26 @@ export function BookCard({ book, demo = false, className }: BookCardProps) {
           </span>
         ) : null}
       </div>
-      <CardHeader className="space-y-1 p-4 pb-2">
-        <h2 className="line-clamp-2 text-base font-semibold leading-snug text-foreground">{book.title}</h2>
+      <CardHeader className={cn("space-y-1", compact ? "px-3 pb-1.5 pt-2" : "p-4 pb-2")}>
+        <h2
+          className={cn(
+            "line-clamp-2 font-semibold leading-snug text-foreground",
+            compact ? "text-sm" : "text-base",
+          )}
+        >
+          {book.title}
+        </h2>
       </CardHeader>
-      <CardContent className="flex flex-1 flex-col gap-3 p-4 pt-0">
+      <CardContent
+        className={cn("flex flex-1 flex-col pt-0", compact ? "gap-2 px-3 pb-3" : "gap-3 p-4 pt-0")}
+      >
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xl font-bold tracking-tight text-foreground">
+          <span
+            className={cn(
+              "font-bold tracking-tight text-foreground",
+              compact ? "text-lg" : "text-xl",
+            )}
+          >
             ¥{Number(book.price).toFixed(2)}
           </span>
           <Badge variant="secondary" className="rounded-lg font-normal">
@@ -69,7 +94,14 @@ export function BookCard({ book, demo = false, className }: BookCardProps) {
           </Badge>
         </div>
         {trustText ? (
-          <p className="text-muted-foreground text-[11px] leading-snug break-words">{trustText}</p>
+          <p
+            className={cn(
+              "text-muted-foreground leading-snug break-words",
+              compact ? "text-[10px]" : "text-[11px]",
+            )}
+          >
+            {trustText}
+          </p>
         ) : null}
         <p className="text-muted-foreground mt-auto line-clamp-1 text-xs">{sellerLabel}</p>
       </CardContent>
@@ -78,8 +110,10 @@ export function BookCard({ book, demo = false, className }: BookCardProps) {
 
   return (
     <Card
+      size={compact ? "sm" : "default"}
       className={cn(
-        "group/card flex h-full flex-col overflow-hidden rounded-xl p-0 transition-all duration-300 hover:scale-105",
+        "group/card flex h-full flex-col overflow-hidden rounded-xl p-0 transition-transform duration-300",
+        compact ? "hover:scale-[1.02]" : "hover:scale-105",
         className,
       )}
     >

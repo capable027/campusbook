@@ -6,7 +6,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { bookImagesAsStrings } from "@/lib/book-queries";
 import { bookCreateSchema } from "@/lib/validations";
-import { saveUploadedImages } from "@/lib/uploads";
+import { blobsFromMultipartImageField, saveUploadedImages } from "@/lib/uploads";
 
 export type BookActionState = { error?: string; success?: boolean };
 
@@ -17,8 +17,7 @@ export async function createBookAction(
   const session = await auth();
   if (!session?.user?.id) return { error: "请先登录" };
 
-  const rawFiles = formData.getAll("images") as unknown as File[];
-  const files = rawFiles.filter((f) => f instanceof File && f.size > 0) as File[];
+  const files = blobsFromMultipartImageField(formData.getAll("images"));
 
   const parsed = bookCreateSchema.safeParse({
     title: formData.get("title"),
@@ -97,8 +96,7 @@ export async function updateBookAction(
     return { error: parsed.error.flatten().formErrors.join("；") || "校验失败" };
   }
 
-  const rawFiles = formData.getAll("images") as unknown as File[];
-  const files = rawFiles.filter((f) => f instanceof File && f.size > 0) as File[];
+  const files = blobsFromMultipartImageField(formData.getAll("images"));
   let images = bookImagesAsStrings(book.images);
   if (files.length > 0) {
     let newUrls: string[] = [];
